@@ -67,7 +67,7 @@ namespace Velvet
 			ApplyTransform(positions, transformMatrix);
 
 			GenerateStretch(positions);
-	//		GenerateAttach(positions);
+			//GenerateAttach(positions);
 			GenerateBending(indices);
 		}
 
@@ -88,7 +88,7 @@ namespace Velvet
 		}
 
 		// 布料生成拉伸约束原本
-		/*void GenerateStretch(const vector<glm::vec3> &positions)
+	/*	void GenerateStretch(const vector<glm::vec3>& positions)
 		{
 			auto VertexAt = [this](int x, int y) {
 				return x * (m_resolution + 1) + y;
@@ -183,35 +183,35 @@ namespace Velvet
 		//			float restDistance = glm::length(slotPos - positions[i]);
 		//			m_solver->AddAttach(m_indexOffset + i, slotIdx, restDistance);
 		//		}
-		//		//m_solver->AddAttach(idx, positions[idx], 0);
+		//		m_solver->AddAttach(idx, positions[idx], 0);
 		//	}
 		//}
-		/*void GenerateAttach(const vector<glm::vec3>& positions)
-		{
-			int numParticles = positions.size();
-			int numSlots = numParticles / 8; // 六边形网格的附着约束每个六边形有8个顶点
+		//void GenerateAttach(const vector<glm::vec3>& positions)
+		//{
+		//	int numParticles = positions.size();
+		//	int numSlots = numParticles / 8; // 六边形网格的附着约束每个六边形有8个顶点
 
-			for (int slotIdx = 0; slotIdx < numSlots; slotIdx++)
-			{
-				// 计算六边形网格的中心点位置
-				glm::vec3 slotPos(0.0f);
-				for (int i = 0; i < 8; i++)
-				{
-					int particleID = slotIdx * 8 + i;
-					slotPos += positions[particleID];
-				}
-				slotPos /= 8.0f;
+		//	for (int slotIdx = 0; slotIdx < numSlots; slotIdx++)
+		//	{
+		//		// 计算六边形网格的中心点位置
+		//		glm::vec3 slotPos(0.0f);
+		//		for (int i = 0; i < 8; i++)
+		//		{
+		//			int particleID = slotIdx * 8 + i;
+		//			slotPos += positions[particleID];
+		//		}
+		//		slotPos /= 8.0f;
 
-				m_solver->AddAttachSlot(slotPos);
+		//		m_solver->AddAttachSlot(slotPos);
 
-				// 添加附着约束
-				for (int i = 0; i < numParticles; i++)
-				{
-					float restDistance = glm::length(slotPos - positions[i]);
-					m_solver->AddAttach(i, slotIdx, restDistance);
-				}
-			}
-		}*/
+		//		// 添加附着约束
+		//		for (int i = 0; i < numParticles; i++)
+		//		{
+		//			float restDistance = glm::length(slotPos - positions[i]);
+		//			m_solver->AddAttach(i, slotIdx, restDistance);
+		//		}
+		//	}
+		//}
 		void GenerateAttach(const vector<glm::vec3>& positions)
 		{
 			int numParticles = positions.size();

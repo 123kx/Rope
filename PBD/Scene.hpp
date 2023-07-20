@@ -486,11 +486,11 @@ namespace Velvet
 
 			// 创建网格
 
-			auto mesh = GenerateClothMesh(resolution);
+			//auto mesh = GenerateClothMesh(resolution);
 			//auto mesh = GenerateClothMeshIrregular(resolution);
 			//auto mesh = GenerateRopeMesh();
 			//绳子
-		//	auto mesh = GenerateRopeMesh(50);//创建网格
+			auto mesh = GenerateRopeMesh(50);//创建网格
 
 			auto renderer = make_shared<MeshRenderer>(mesh, material, true);//渲染
 			renderer->SetMaterialProperty(materialProperty);//材质

@@ -20,7 +20,7 @@ public:
         SpawnInfinitePlane(game);
 
         auto sphere = SpawnSphere(game);
-        float radius = 1.0f;
+        float radius = 0.0f;
         float mass = 2.0;
         sphere->Initialize(glm::vec3(0, radius, -1), glm::vec3(radius),glm::vec3(0),mass);
      /*   game->animationUpdate.Register([sphere, game, radius]() {
