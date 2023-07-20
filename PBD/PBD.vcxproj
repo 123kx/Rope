@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{967CD179-D86A-46F4-86F5-63FF0C44D89A}</ProjectGuid>
+    <RootNamespace>PBD</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.8.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)Linking\include;$(ProjectDir)Linking\include\imgui;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)Linking\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)Linking\include;$(ProjectDir)Linking\include\imgui;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)Linking\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>false</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;assimp\assimp-vc142-mtd.lib;GLFW\glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CudaCompile>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;assimp\assimp-vc142-mtd.lib;GLFW\glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CudaCompile>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CudaCompile Include="SpatialHashGPU.cu" />
+    <CudaCompile Include="VtClothSolverGPU.cu" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Actor.hpp" />
+    <ClInclude Include="Camera.hpp" />
+    <ClInclude Include="Collider.hpp" />
+    <ClInclude Include="Common.cuh" />
+    <ClInclude Include="Common.hpp" />
+    <ClInclude Include="Component.hpp" />
+    <ClInclude Include="cuda\helper_cuda.h" />
+    <ClInclude Include="cuda\helper_math.h" />
+    <ClInclude Include="cuda\helper_string.h" />
+    <ClInclude Include="GameInstance.hpp" />
+    <ClInclude Include="Global.hpp" />
+    <ClInclude Include="GUI.hpp" />
+    <ClInclude Include="Helper.hpp" />
+    <ClInclude Include="Input.hpp" />
+    <ClInclude Include="Light.hpp" />
+    <ClInclude Include="Linking\include\imgui\imconfig.h" />
+    <ClInclude Include="Linking\include\imgui\imgui.h" />
+    <ClInclude Include="Linking\include\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="Linking\include\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="Linking\include\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="Linking\include\imgui\imgui_internal.h" />
+    <ClInclude Include="Linking\include\imgui\imstb_rectpack.h" />
+    <ClInclude Include="Linking\include\imgui\imstb_textedit.h" />
+    <ClInclude Include="Linking\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="Material.hpp" />
+    <ClInclude Include="MaterialProperty.hpp" />
+    <ClInclude Include="Mesh.hpp" />
+    <ClInclude Include="MeshRenderer.hpp" />
+    <ClInclude Include="MouseGrabber.hpp" />
+    <ClInclude Include="ParticleGeometryRenderer.hpp" />
+    <ClInclude Include="ParticleInstancedRenderer.hpp" />
+    <ClInclude Include="PlayerController.hpp" />
+    <ClInclude Include="RenderPipeline.hpp" />
+    <ClInclude Include="Resource.hpp" />
+    <ClInclude Include="Scene.hpp" />
+    <ClInclude Include="SpatialHashCPU.hpp" />
+    <ClInclude Include="SpatialHashGPU.cuh" />
+    <ClInclude Include="SpatialHashGPU.hpp" />
+    <ClInclude Include="External\stb_image.h" />
+    <ClInclude Include="Timer.hpp" />
+    <ClInclude Include="Transform.hpp" />
+    <ClInclude Include="VtBuffer.hpp" />
+    <ClInclude Include="VtClothObjectGPU.hpp" />
+    <ClInclude Include="VtClothSolverGPU.cuh" />
+    <ClInclude Include="VtClothSolverGPU.hpp" />
+    <ClInclude Include="VtEngine.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Actor.cpp" />
+    <ClCompile Include="Component.cpp" />
+    <ClCompile Include="GameInstance.cpp" />
+    <ClCompile Include="glad.c" />
+    <ClCompile Include="GUI.cpp" />
+    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Linking\include\imgui\imgui.cpp" />
+    <ClCompile Include="Linking\include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="Linking\include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="Linking\include\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="Linking\include\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="Linking\include\imgui\imgui_tables.cpp" />
+    <ClCompile Include="Linking\include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="MeshRenderer.cpp" />
+    <ClCompile Include="stb_image.cpp" />
+    <ClCompile Include="test.cpp" />
+    <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="VtEngine.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.8.targets" />
+  </ImportGroup>
+</Project>
