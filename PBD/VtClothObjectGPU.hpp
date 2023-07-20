@@ -147,9 +147,51 @@ namespace Velvet
 					}
 				}
 			}
-		}
-	
+		}	
+	/*	void GenerateStretch(const vector<glm::vec3>& positions)
+		{
+			auto VertexAt = [](int x, int y, int resolution) {
+				return x * (resolution + 1) + y;
+			};
+			auto DistanceBetween = [&positions](int idx1, int idx2) {
+				return glm::length(positions[idx1] - positions[idx2]);
+			};
 
+			int resolution = static_cast<int>(sqrt(positions.size())) - 1;  // 计算六边形网格的分辨率
+
+			for (int x = 0; x < resolution + 1; x++)
+			{
+				for (int y = 0; y < resolution + 1; y++)
+				{
+					int idx1, idx2;
+
+					if (y != resolution)
+					{
+						idx1 = VertexAt(x, y, resolution);
+						idx2 = VertexAt(x, y + 1, resolution);
+						m_solver->AddStretch(idx1, idx2, DistanceBetween(idx1, idx2));
+					}
+
+					if (x != resolution)
+					{
+						idx1 = VertexAt(x, y, resolution);
+						idx2 = VertexAt(x + 1, y, resolution);
+						m_solver->AddStretch(idx1, idx2, DistanceBetween(idx1, idx2));
+					}
+
+					if (y != resolution && x != resolution)
+					{
+						idx1 = VertexAt(x, y, resolution);
+						idx2 = VertexAt(x + 1, y + 1, resolution);
+						m_solver->AddStretch(idx1, idx2, DistanceBetween(idx1, idx2));
+
+						idx1 = VertexAt(x, y + 1, resolution);
+						idx2 = VertexAt(x + 1, y, resolution);
+						m_solver->AddStretch(idx1, idx2, DistanceBetween(idx1, idx2));
+					}
+				}
+			}
+		}*/
 		// 产生弯曲约束
 		void GenerateBending(const vector<unsigned int>& indices)
 		{
@@ -167,7 +209,6 @@ namespace Velvet
 			}
 		}
 		 
-
 		// 产生附着
 		//void GenerateAttach(const vector<glm::vec3>& positions)
 		//{
