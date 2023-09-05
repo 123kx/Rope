@@ -92,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.hpp" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="Camera.hpp" />
     <ClInclude Include="Collider.hpp" />
     <ClInclude Include="Common.cuh" />
@@ -124,12 +125,16 @@
     <ClInclude Include="ParticleInstancedRenderer.hpp" />
     <ClInclude Include="PlayerController.hpp" />
     <ClInclude Include="RenderPipeline.hpp" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Resource.hpp" />
     <ClInclude Include="Scene.hpp" />
+    <ClInclude Include="shader_m.h" />
+    <ClInclude Include="skyBox.h" />
     <ClInclude Include="SpatialHashCPU.hpp" />
     <ClInclude Include="SpatialHashGPU.cuh" />
     <ClInclude Include="SpatialHashGPU.hpp" />
     <ClInclude Include="External\stb_image.h" />
+    <ClInclude Include="stb_image.h" />
     <ClInclude Include="Timer.hpp" />
     <ClInclude Include="Transform.hpp" />
     <ClInclude Include="VtBuffer.hpp" />
@@ -157,6 +162,21 @@
     <ClCompile Include="test.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="VtEngine.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\skybox\back.jpg" />
+    <Image Include="Assets\skybox\bottom.jpg" />
+    <Image Include="Assets\skybox\front.jpg" />
+    <Image Include="Assets\skybox\left.jpg" />
+    <Image Include="Assets\skybox\right.jpg" />
+    <Image Include="Assets\skybox\top.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PBD.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shader\skybox.fs" />
+    <None Include="shader\skybox.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

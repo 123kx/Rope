@@ -153,8 +153,62 @@ namespace Velvet
 	}
 
 	// 处理弯曲约束
+	//__global__ void SolveBending_Kernel(
+	//	glm::vec3* predicted,
+	//	glm::vec3* deltas,
+	//	int* deltaCounts,
+	//	CONST(uint*) bendingIndices,
+	//	CONST(float*) bendingAngles,
+	//	CONST(float*) invMass,
+	//	const uint numConstraints,
+	//	const float deltaTime)
+	//{
+	//	// 根据约束数量计算ID
+	//	GET_CUDA_ID(id, numConstraints);
+	//	uint idx1 = bendingIndices[id * 4];
+	//	uint idx2 = bendingIndices[id * 4+1];
+	//	uint idx3 = bendingIndices[id * 4+2];
+	//	uint idx4 = bendingIndices[id * 4+3];
+	//	// 期望弯曲角度
+	//	float expectedAngle = bendingAngles[id];
+	//	// 质量倒数
+	//	float w1 = invMass[idx1];
+	//	float w2 = invMass[idx2];
+	//	float w3 = invMass[idx3];
+	//	float w4 = invMass[idx4];
+	//	glm::vec3 p1 = predicted[idx1];
+	//	glm::vec3 p2 = predicted[idx2] - p1;
+	//	glm::vec3 p3 = predicted[idx3] - p1;
+	//	glm::vec3 p4 = predicted[idx4] - p1;
+	//	glm::vec3 n1 = glm::normalize(glm::cross(p2, p3));
+	//	glm::vec3 n2 = glm::normalize(glm::cross(p2, p4));
+	//	float d = clamp(glm::dot(n1, n2), 0.0f, 1.0f);
+	//	float angle = acos(d);
+	//	// cross product for two equal vector produces NAN
+	//	if (angle < EPSILON || isnan(d)) return;
+	//	glm::vec3 q3 = (glm::cross(p2, n2) + glm::cross(n1, p2) * d) / (glm::length(glm::cross(p2, p3)) + EPSILON);
+	//	glm::vec3 q4 = (glm::cross(p2, n1) + glm::cross(n2, p2) * d) / (glm::length(glm::cross(p2, p4)) + EPSILON);
+	//	glm::vec3 q2 = -(glm::cross(p3, n2) + glm::cross(n1, p3) * d) / (glm::length(glm::cross(p2, p3)) + EPSILON)
+	//		- (glm::cross(p4, n1) + glm::cross(n2, p4) * d) / (glm::length(glm::cross(p2, p4)) + EPSILON);
+	//	glm::vec3 q1 = -q2 - q3 - q4;
+	//	float xpbd_bend = d_params.bendCompliance / deltaTime / deltaTime;
+	//	// 对应CSDN bending （https://blog.csdn.net/weixin_43940314/article/details/129830991）
+	//	float denom = xpbd_bend + (w1 * glm::dot(q1, q1) + w2 * glm::dot(q2, q2) + w3 * glm::dot(q3, q3) + w4 * glm::dot(q4, q4));
+	//	if (denom < EPSILON) return; // ?
+	//	float lambda = sqrt(1.0f - d * d) * (angle - expectedAngle) / denom;
+	//	int reorder = idx1 + idx2 + idx3 + idx4;
+	//	AtomicAdd(deltas, idx1, w1 * lambda * q1, reorder);
+	//	AtomicAdd(deltas, idx2, w2 * lambda * q2, reorder);
+	//	AtomicAdd(deltas, idx3, w3 * lambda * q3, reorder);
+	//	AtomicAdd(deltas, idx4, w4 * lambda * q4, reorder);
+	//	
+	//	atomicAdd(&deltaCounts[idx1], 1);
+	//	atomicAdd(&deltaCounts[idx2], 1);
+	//	atomicAdd(&deltaCounts[idx3], 1);
+	//	atomicAdd(&deltaCounts[idx4], 1);
+	//}
 	__global__ void SolveBending_Kernel(
-		glm::vec3* predicted,
+		glm::vec3* predictedNormals,
 		glm::vec3* deltas,
 		int* deltaCounts,
 		CONST(uint*) bendingIndices,
@@ -163,42 +217,34 @@ namespace Velvet
 		const uint numConstraints,
 		const float deltaTime)
 	{
-		// 根据约束数量计算ID
 		GET_CUDA_ID(id, numConstraints);
 		uint idx1 = bendingIndices[id * 4];
-		uint idx2 = bendingIndices[id * 4+1];
-		uint idx3 = bendingIndices[id * 4+2];
-		uint idx4 = bendingIndices[id * 4+3];
-		// 期望弯曲角度
+		uint idx2 = bendingIndices[id * 4 + 1];
+		uint idx3 = bendingIndices[id * 4 + 2];
+		uint idx4 = bendingIndices[id * 4 + 3];
 		float expectedAngle = bendingAngles[id];
-		// 质量倒数
 		float w1 = invMass[idx1];
 		float w2 = invMass[idx2];
 		float w3 = invMass[idx3];
 		float w4 = invMass[idx4];
 
-		glm::vec3 p1 = predicted[idx1];
-		glm::vec3 p2 = predicted[idx2] - p1;
-		glm::vec3 p3 = predicted[idx3] - p1;
-		glm::vec3 p4 = predicted[idx4] - p1;
-		glm::vec3 n1 = glm::normalize(glm::cross(p2, p3));
-		glm::vec3 n2 = glm::normalize(glm::cross(p2, p4));
+		glm::vec3 n1 = predictedNormals[idx1];
+		glm::vec3 n2 = predictedNormals[idx2];
+		glm::vec3 n3 = predictedNormals[idx3];
+		glm::vec3 n4 = predictedNormals[idx4];
 
 		float d = clamp(glm::dot(n1, n2), 0.0f, 1.0f);
 		float angle = acos(d);
-		// cross product for two equal vector produces NAN
 		if (angle < EPSILON || isnan(d)) return;
 
-		glm::vec3 q3 = (glm::cross(p2, n2) + glm::cross(n1, p2) * d) / (glm::length(glm::cross(p2, p3)) + EPSILON);
-		glm::vec3 q4 = (glm::cross(p2, n1) + glm::cross(n2, p2) * d) / (glm::length(glm::cross(p2, p4)) + EPSILON);
-		glm::vec3 q2 = -(glm::cross(p3, n2) + glm::cross(n1, p3) * d) / (glm::length(glm::cross(p2, p3)) + EPSILON)
-			- (glm::cross(p4, n1) + glm::cross(n2, p4) * d) / (glm::length(glm::cross(p2, p4)) + EPSILON);
-		glm::vec3 q1 = -q2 - q3 - q4;
+		glm::vec3 q1 = n1 - n2;
+		glm::vec3 q2 = n2 - n1;
+		glm::vec3 q3 = n3 - n4;
+		glm::vec3 q4 = n4 - n3;
 
 		float xpbd_bend = d_params.bendCompliance / deltaTime / deltaTime;
-		// 对应CSDN bending （https://blog.csdn.net/weixin_43940314/article/details/129830991）
 		float denom = xpbd_bend + (w1 * glm::dot(q1, q1) + w2 * glm::dot(q2, q2) + w3 * glm::dot(q3, q3) + w4 * glm::dot(q4, q4));
-		if (denom < EPSILON) return; // ?
+		if (denom < EPSILON) return;
 		float lambda = sqrt(1.0f - d * d) * (angle - expectedAngle) / denom;
 
 		int reorder = idx1 + idx2 + idx3 + idx4;
@@ -206,13 +252,12 @@ namespace Velvet
 		AtomicAdd(deltas, idx2, w2 * lambda * q2, reorder);
 		AtomicAdd(deltas, idx3, w3 * lambda * q3, reorder);
 		AtomicAdd(deltas, idx4, w4 * lambda * q4, reorder);
-		
+
 		atomicAdd(&deltaCounts[idx1], 1);
 		atomicAdd(&deltaCounts[idx2], 1);
 		atomicAdd(&deltaCounts[idx3], 1);
 		atomicAdd(&deltaCounts[idx4], 1);
 	}
-
 	void SolveBending(
 		glm::vec3* predicted,
 		glm::vec3* deltas,
@@ -413,7 +458,7 @@ namespace Velvet
 
 			glm::vec3 relativeVelocity = vel_i - (pred_j - positions[j]);
 			//
-			glm::vec3 friction1 = glm::vec3(5.0);
+			glm::vec3 friction1 = glm::vec3(10.0);//设置摩擦力
 			glm::vec3 friction = ComputeFriction(common, relativeVelocity, friction1);
 			positionDelta += w_i * friction;
 		}

@@ -12,6 +12,7 @@
 #include "Component.hpp"
 #include "Common.hpp"
 
+
 namespace Velvet
 {
 	using namespace std;
@@ -86,5 +87,8 @@ namespace Velvet
 		vector<shared_ptr<Actor>> m_actors;
 		// ‰÷»æπ‹œﬂ
 		shared_ptr<RenderPipeline> m_renderPipeline;
+
+
+
 	};
 }

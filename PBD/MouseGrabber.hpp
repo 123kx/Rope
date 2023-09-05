@@ -28,7 +28,7 @@ namespace Velvet
 	};
 
 	struct RaycastCollision
-	{	
+	{
 		// 是否碰撞
 		bool collide = false;
 		// 物体的索引
@@ -64,9 +64,9 @@ namespace Velvet
 					// 已经被抓取
 					m_isGrabbing = true;
 					// 被抓取点的质量
-					m_grabbedVertexMass = (*m_invMass)[m_rayCollision.objectIndex];  
+					m_grabbedVertexMass = (*m_invMass)[m_rayCollision.objectIndex];
 					// 将抓取点的质量置为0
-					(*m_invMass)[m_rayCollision.objectIndex] = 0;//
+					(*m_invMass)[m_rayCollision.objectIndex] = 60;//以前质量为0
 				}
 			}
 			// 释放物体
@@ -78,20 +78,45 @@ namespace Velvet
 			}
 		}
 
-		// 更新抓取点
+		// 更新抓取点   原
+		//void UpdateGrappedVertex()
+		//{
+		//	if (m_isGrabbing)
+		//	{
+		//		Ray ray = GetMouseRay();
+		//		// 鼠标在世界坐标中的位置			
+		//		glm::vec3 mousePos = ray.origin + ray.direction * m_rayCollision.distanceToOrigin;
+		//		int id = m_rayCollision.objectIndex;
+		//		auto curPos = (*m_positions)[id];
+		//		glm::vec3 target = Helper::Lerp(mousePos, curPos, 0.8f);
+
+		//		(*m_positions)[id] = target;
+		//		(*m_velocities)[id] = (target - curPos) / Timer::fixedDeltaTime();
+		//	}
+		//}
+
 		void UpdateGrappedVertex()
 		{
 			if (m_isGrabbing)
 			{
 				Ray ray = GetMouseRay();
-				// 鼠标在世界坐标中的位置			
 				glm::vec3 mousePos = ray.origin + ray.direction * m_rayCollision.distanceToOrigin;
 				int id = m_rayCollision.objectIndex;
 				auto curPos = (*m_positions)[id];
-				glm::vec3 target = Helper::Lerp(mousePos, curPos, 0.8f);
+				glm::vec3 target = Helper::Lerp(mousePos, curPos, 0.5f); // 调小插值权重
 
-				(*m_positions)[id] = target;
-				(*m_velocities)[id] = (target - curPos) / Timer::fixedDeltaTime();
+				// 根据鼠标位置找到相邻顶点索引
+				int startIndex = id - 1;//
+				int endIndex = id + 1;
+				if (startIndex < 0) startIndex = 0;
+				if (endIndex >= m_positions->size()) endIndex = m_positions->size() - 1;
+
+				for (int i = startIndex; i <= endIndex; i++)
+				{
+					auto position = (*m_positions)[i];
+					(*m_positions)[i] = Helper::Lerp(target, position, 0.5f); // 调小插值权重
+					(*m_velocities)[i] = ((*m_positions)[i] - position) / Timer::fixedDeltaTime();
+				}
 			}
 		}
 
@@ -124,8 +149,8 @@ namespace Velvet
 			}
 			return RaycastCollision{ result >= 0, result, minDistanceToView };
 		}
-	
-	
+
+
 
 		Ray GetMouseRay()
 		{

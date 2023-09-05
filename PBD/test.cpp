@@ -6,6 +6,19 @@
 #include "Scene.hpp"
 #include "Helper.hpp"
 
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include "stb_image.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "shader_m.h"
+#include "camera.h"
+#include <filesystem>
+
 using namespace Velvet;
 
 class SceneClothSDF : public Scene
@@ -19,15 +32,15 @@ public:
 
         SpawnInfinitePlane(game);
 
-        auto sphere = SpawnSphere(game);
+    /*    auto sphere = SpawnSphere(game);
         float radius = 0.0f;
         float mass = 2.0;
-        sphere->Initialize(glm::vec3(0, radius, -1), glm::vec3(radius),glm::vec3(0),mass);
-     /*   game->animationUpdate.Register([sphere, game, radius]() {
-            float time = Timer::fixedDeltaTime() * Timer::physicsFrameCount();
-            sphere->transform->position = glm::vec3(0, radius, -cos(time * 2));
-            });*/
-        sphere->transform->position = glm::vec3(0,1,3);
+        sphere->Initialize(glm::vec3(0, radius, -1), glm::vec3(radius), glm::vec3(0), mass);*/
+        /*   game->animationUpdate.Register([sphere, game, radius]() {
+               float time = Timer::fixedDeltaTime() * Timer::physicsFrameCount();
+               sphere->transform->position = glm::vec3(0, radius, -cos(time * 2));
+               });*/
+       // sphere->transform->position = glm::vec3(0, 1, 3);
         int clothResolution = 12;
         auto cloth = SpawnCloth(game, clothResolution, 2);
         cloth->Initialize(glm::vec3(0, 2.5f, 0), glm::vec3(1.0));
@@ -36,12 +49,12 @@ public:
 #else
         auto clothObj = cloth->GetComponent<VtClothObjectGPU>();
 #endif
-        if (clothObj) clothObj->SetAttachedIndices({ 0, clothResolution-3 });
+        if (clothObj) clothObj->SetAttachedIndices({ 0, clothResolution - 3 });
     }
 };
 
-int main() 
-{	
+int main()
+{
     //=====================================
         // 1. Create graphics
         //=====================================

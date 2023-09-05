@@ -18,6 +18,7 @@
 
 #include<cmath>
 
+
 //#define SOLVER_CPU
 
 namespace Velvet
@@ -54,14 +55,15 @@ namespace Velvet
 		{
 			// Camera
 			auto camera = SpawnCamera(game);
-			camera->Initialize(glm::vec3(0.35, 3.3, 7.2),
+			camera->Initialize(glm::vec3(0.35, 23.3,57.2),
 				glm::vec3(1),
-				glm::vec3(-21, 2.25, 0));
+				glm::vec3(-21, 12.25, 0));
 
 			// Light
 			auto light = SpawnLight(game);
-			light->Initialize(glm::vec3(2.5f, 5.0f, 2.5f),
-				glm::vec3(0.2f),
+			//position,scale,rotation
+			light->Initialize(glm::vec3(8.5f,50.0f, 20.5f),
+				glm::vec3(6.2f),
 				glm::vec3(20, 30, 0));
 			auto lightComp = light->GetComponent<Light>();
 
@@ -171,7 +173,7 @@ namespace Velvet
 		}
 
 		/*这个方法就是绳子很长时就会出现错误
-//	shared_ptr<Mesh> GenerateRopeMesh(int vertLineNum)*/	
+//	shared_ptr<Mesh> GenerateRopeMesh(int vertLineNum)*/
 //{
 //vector<glm::vec3> vertices;
 //vector<glm::vec3> normals;
@@ -219,14 +221,15 @@ namespace Velvet
 //	}
 	//	创建绳子模型
 	//	 一段直接生成网格
+
 		shared_ptr<Mesh> GenerateRopeMesh(int vertLineNum)
 		{
 			vector<glm::vec3> vertices;
 			vector<glm::vec3> normals;
 			vector<glm::vec2> uvs;
 			vector<unsigned int> indices;
-			const glm::vec3& bornPos = glm::vec3(0.0f);
-			int length = 10;
+			const glm::vec3 bornPos = glm::vec3(0.0f);
+			int length = 100;
 			float radius = 0.3f;
 			vertices.reserve(vertLineNum * 6);
 			normals.reserve(vertLineNum * 6);
@@ -234,34 +237,87 @@ namespace Velvet
 			indices.reserve(length * 6 * 2 * 3);
 			float M_PI = std::acos(-1.0f);
 
-			int triangleIterator = 0;
 			for (int i = 0; i < vertLineNum; i++)
 			{
 				for (int j = 0; j < 6; j++)
 				{
 					int vertIndex = i * 6 + j;
-					vertices.push_back(glm::vec3(bornPos.x, bornPos.y, bornPos.z + i));
-					double angle = M_PI / 3 * j;
-					vertices[vertIndex].x += radius * cos(angle);
-					vertices[vertIndex].y += radius * sin(angle);
-					//uvs.push_back(glm::vec2(1.0f / 6.0f * j, 1.0f /static_cast<float>(length) * i));
-					uvs.push_back(glm::vec2(vertLineNum * 6));
+					float angle = M_PI / 3 * j;
+					glm::vec3 vertex(bornPos.x, bornPos.y, bornPos.z + i);
+					vertex.x += radius * cos(angle);
+					vertex.y += radius * sin(angle);
+
+					vertices.push_back(vertex);
 					normals.push_back(glm::vec3(0, 0, 1));
-					uvs[vertIndex] = glm::vec2(1.0f/6*j,1.0f/length*i);
+					uvs.push_back(glm::vec2(1.0f / 6 * j, 1.0f / length * i));
+
 					if (i < vertLineNum - 1)
 					{
+						// 添加六面体的连接索引
+						int nextRowIndex = i + 1;
+						int nextRowVertIndex = nextRowIndex * 6 + j;
+
 						indices.push_back(vertIndex);
-						indices.push_back(j == 5 ? vertIndex + 1 : vertIndex + 7);
-						indices.push_back(j == 5 ? vertIndex - 5 : vertIndex + 1);
+						indices.push_back(nextRowVertIndex);
+						indices.push_back(j == 5 ? nextRowIndex * 6 : nextRowVertIndex + 1);
+
 						indices.push_back(vertIndex);
-						indices.push_back(vertIndex + 6);
-						indices.push_back(j == 5 ? vertIndex + 1 : vertIndex + 7);
+						indices.push_back(j == 5 ? nextRowIndex * 6 : nextRowVertIndex + 1);
+						indices.push_back(j == 5 ? i * 6 : vertIndex + 1);
 					}
 				}
 			}
+
 			auto mesh = make_shared<Mesh>(vertices, normals, uvs, indices);
 			return mesh;
-		}
+		}			
+		//圆柱
+		//float M_PI = 3.14;
+		//
+		//shared_ptr<Mesh> GenerateRopeMesh(int vertLineNum)
+		//{
+		//	vector<glm::vec3> vertices;
+		//	vector<glm::vec3> normals;
+		//	vector<glm::vec2> uvs;
+		//	vector<unsigned int> indices;
+		//	const glm::vec3& bornPos = glm::vec3(0.0f);
+		//	int length = 10;
+		//	float radius = 0.3f;
+		//	vertices.reserve(length * vertLineNum);
+		//	normals.reserve(length * vertLineNum);
+		//	uvs.reserve(length * vertLineNum);
+		//	indices.reserve((length - 1) * 2 * 3 * vertLineNum);
+
+		//	float angleStep = 2 * M_PI / vertLineNum;
+
+		//	for (int i = 0; i < length; i++)
+		//	{
+		//		float posY = bornPos.y + i;
+		//		for (int j = 0; j < vertLineNum; j++)
+		//		{
+		//			float posX = bornPos.x + radius * cos(j * angleStep);
+		//			float posZ = bornPos.z + radius * sin(j * angleStep);
+		//			vertices.push_back(glm::vec3(posX, posY, posZ));
+		//			normals.push_back(glm::vec3(0, 0, 1));
+		//			uvs.push_back(glm::vec2(j / static_cast<float>(vertLineNum - 1), i / static_cast<float>(length - 1)));
+
+		//			if (i < length - 1)
+		//			{
+		//				// Create indices for triangle strips
+		//				indices.push_back(i * vertLineNum + j);
+		//				indices.push_back(i * vertLineNum + (j + 1) % vertLineNum);
+		//				indices.push_back((i + 1) * vertLineNum + j);
+
+		//				indices.push_back(i * vertLineNum + (j + 1) % vertLineNum);
+		//				indices.push_back((i + 1) * vertLineNum + (j + 1) % vertLineNum);
+		//				indices.push_back((i + 1) * vertLineNum + j);
+		//			}
+		//		}
+		//	}
+
+		//	auto mesh = make_shared<Mesh>(vertices, normals, uvs, indices);
+		//	return mesh;
+		//}
 
 		//	分段生成网格
 		/*shared_ptr<Mesh> GenerateRopeMesh(int vertLineNum, int segmentCount)
@@ -461,7 +517,7 @@ namespace Velvet
 		}
 
 		// 创建布料
-		shared_ptr<Actor> SpawnCloth(GameInstance* game, int resolution = 16, int textureFile = 1, shared_ptr<VtClothSolverGPU> solver = nullptr)
+		shared_ptr<Actor> SpawnCloth(GameInstance* game, int resolution=100, int textureFile = 1, shared_ptr<VtClothSolverGPU> solver = nullptr)
 		{
 			auto cloth = game->CreateActor("Cloth Generated");
 
@@ -473,8 +529,8 @@ namespace Velvet
 
 			//	std::string fileName = "fabric" + std::to_string(std::clamp(textureFile, 1, 3)) + ".jpg";
 
-			//std::string fileName = "shengzi.png";
-			std::string fileName = "fabric1.jpg";
+			std::string fileName = "mabu.png";
+			//std::string fileName = "fabric1.jpg";
 			auto texture = Resource::LoadTexture(fileName);
 
 			materialProperty.preRendering = [texture](Material* mat) {
@@ -489,8 +545,8 @@ namespace Velvet
 			//auto mesh = GenerateClothMesh(resolution);
 			//auto mesh = GenerateClothMeshIrregular(resolution);
 			//auto mesh = GenerateRopeMesh();
-			//绳子
-			auto mesh = GenerateRopeMesh(50);//创建网格
+			//绳子  
+			auto mesh = GenerateRopeMesh(100);//创建网格
 
 			auto renderer = make_shared<MeshRenderer>(mesh, material, true);//渲染
 			renderer->SetMaterialProperty(materialProperty);//材质

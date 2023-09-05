@@ -82,7 +82,7 @@ namespace Velvet
 			// This can produce unstable behavior, such as vertex flashing between two sides.
 			// We include a pre-stabilization step to mitigate this issue. Collision here will not influence velocity.
 			// 第一个positions是碰撞修正后   第二个是原始位置
-			// 碰撞是每帧进行碰撞
+			// 碰撞是每帧进行碰撞   ，计算了摩擦力
 			CollideSDF(positions, sdfColliders, positions, (uint)sdfColliders.size(), frameTime);
 			// 预测是每帧时间除以步长之后的次数进行迭代
 			for (int substep = 0; substep < Global::simParams.numSubsteps; ++substep)
@@ -96,7 +96,7 @@ namespace Velvet
 					{
 						m_spatialHash->Hash(predicted);
 					}
-					// 粒子碰撞
+					// 粒子碰撞   
 					CollideParticles(deltas, deltaCounts, predicted, invMasses, m_spatialHash->neighbors, positions);
 				}
 				// 每步长碰撞
@@ -105,6 +105,7 @@ namespace Velvet
 				// 迭代求约束
 				for (int iteration = 0; iteration < Global::simParams.numIterations; iteration++)
 				{
+
 					// 拉伸约束
 					SolveStretch(predicted, deltas, deltaCounts, stretchIndices, stretchLengths, invMasses, (uint)stretchLengths.size());
 					// 附加约束
@@ -176,7 +177,6 @@ namespace Velvet
 
 			double time = Timer::EndTimer("INIT_SOLVER_GPU") * 1000;
 
-
 			//fmt::print("Info(ClothSolverGPU): AddCloth done. Took time {:.2f} ms\n", time);
 			//fmt::print("Info(ClothSolverGPU): Use recommond max vel = {}\n", Global::simParams.maxSpeed);
 
@@ -206,7 +206,7 @@ namespace Velvet
 		void AddAttach(int particleIndex, int slotIndex, float distance)
 		{
 			// 质量为0表示静止
-			if (distance == 0) 
+			if (distance == 0)
 				invMasses[particleIndex] = 0;
 			// 附加物粒子ID
 			attachParticleIDs.push_back(particleIndex);
@@ -217,7 +217,7 @@ namespace Velvet
 		}
 
 		// 增加弯曲约束
-		void AddBend(uint idx1, uint idx2, uint idx3, uint idx4, float angle)
+		void AddBend(uint idx1, uint idx2, uint idx3, uint idx4,float angle)
 		{
 			// 二面角索引
 			bendIndices.push_back(idx1);
@@ -227,7 +227,7 @@ namespace Velvet
 			// 二面角角度
 			bendAngles.push_back(angle);
 		}
-		
+
 		// 更新碰撞
 		void UpdateColliders(vector<Collider*>& colliders)
 		{
@@ -292,7 +292,7 @@ namespace Velvet
 					IMGUI_LEFT_LABEL(ImGui::SliderInt, "ParticleID1", &particleIndex1, 0, Global::simParams.numParticles - 1);
 					ImGui::Indent(10);
 					//ImGui::Text(fmt::format("Position: {}", predicted[particleIndex1]).c_str());
-					
+
 					std::string text = "Position: " + Helper::to_string(predicted[particleIndex1]);
 					ImGui::Text(text.c_str());
 
@@ -305,7 +305,7 @@ namespace Velvet
 					ImGui::Text(oss.str().c_str());
 
 					auto norm = normals[particleIndex1];
-					
+
 					//ImGui::Text(fmt::format("Normal: [{:.3f},{:.3f},{:.3f}]", norm.x, norm.y, norm.z).c_str());
 					ImGui::Text("Normal: [%.3f, %.3f, %.3f]", norm.x, norm.y, norm.z);
 
@@ -336,9 +336,9 @@ namespace Velvet
 					static int neighborRange2 = 0;
 					IMGUI_LEFT_LABEL(ImGui::SliderInt, "NeighborRange2", &neighborRange2, 0, 63);
 					//ImGui::Text(fmt::format("NeighborID: {}", m_spatialHash->neighbors[neighborRange2 + particleIndex2 * Global::simParams.maxNumNeighbors]).c_str());
-					
+
 					ImGui::Text("NeighborID: %d", m_spatialHash->neighbors[neighborRange2 + particleIndex2 * Global::simParams.maxNumNeighbors]);
-					
+
 					ImGui::Indent(-10);
 				}
 				static int cellID = 0;
@@ -355,7 +355,7 @@ namespace Velvet
 					static int particleHash = 0;
 					particleHash = clamp(particleHash, start, end - 1);
 					IMGUI_LEFT_LABEL(ImGui::SliderInt, "HashID", &particleHash, start, end - 1);
-					
+
 					std::string text = "ParticleHash: " + m_spatialHash->particleHash[particleHash];
 					ImGui::Text(text.c_str());
 					std::string text2 = "ParticleIndex: " + m_spatialHash->particleIndex[particleHash];

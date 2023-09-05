@@ -14,6 +14,7 @@ namespace Velvet
 {
 	class SpatialHashGPU
 	{
+
 	public:
 		SpatialHashGPU(float particleDiameter, int maxNumObjects)
 		{

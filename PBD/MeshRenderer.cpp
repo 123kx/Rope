@@ -100,10 +100,10 @@ namespace Velvet
 		m_material->SetMat3("_Normalmatrix", glm::mat3(glm::transpose(glm::inverse(model))));
 
 		m_material->SetMat4("_WorldToLight", lightMatrix);
-		
+
 		// 真正的渲染在这里
 		DrawCall();
-	}	
+	}
 
 	void MeshRenderer::RenderShadow(glm::mat4 lightMatrix)
 	{

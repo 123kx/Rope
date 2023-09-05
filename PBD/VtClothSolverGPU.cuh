@@ -53,8 +53,8 @@ namespace Velvet
 				glm::vec3 offset = glm::abs(localPos) - cubeSize;
 
 				float maxVal = max(offset.x, max(offset.y, offset.z));
-				float minVal = min(offset.x, min(offset.y, offset.z)); 
-				float midVal = offset.x  + offset.y + offset.z - maxVal - minVal;
+				float minVal = min(offset.x, min(offset.y, offset.z));
+				float midVal = offset.x + offset.y + offset.z - maxVal - minVal;
 				float scalar = 1.0f;
 
 				if (maxVal < 0)
@@ -118,7 +118,7 @@ namespace Velvet
 		CONST(float*) stretchLengths,
 		CONST(float*) invMasses,
 		const uint numConstraints);
-	
+
 	// Bending doesn't work well with Jacobi. Small compliance lead to shaking, large compliance makes no effect.
 	// It's recommended to disable this.
 	// ÍäÇú

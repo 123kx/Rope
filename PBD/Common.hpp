@@ -11,17 +11,17 @@
 // Since CUDA doesn't allow dynamics initialization, 
 // we use this macro to ignore initialization when compiling with NVCC.
 #ifdef __CUDA_ARCH__
-	#define HOST_INIT(val) 
+#define HOST_INIT(val) 
 #else
-	#define HOST_INIT(val) = val
+#define HOST_INIT(val) = val
 #endif
 
 // 模拟参数
 struct VtSimParams
 {
 	int numSubsteps					HOST_INIT(2);
-	int numIterations				HOST_INIT(4);						//!< Number of solver iterations to perform per-substep
-	int maxNumNeighbors				HOST_INIT(64);
+	int numIterations				HOST_INIT(1);						//!< Number of solver iterations to perform per-substep
+	int maxNumNeighbors				HOST_INIT(30);//64
 	float maxSpeed					HOST_INIT(50);						//!< The magnitude of particle velocity will be clamped to this value at the end of each step
 
 	// forces 力
@@ -40,7 +40,7 @@ struct VtSimParams
 	// runtime info 运行信息
 	unsigned int numParticles;											//!< Total number of particles 
 	float particleDiameter;												//!< The maximum interaction radius for particles
-	float deltaTime;	
+	float deltaTime;
 
 	// misc
 	float particleDiameterScalar	HOST_INIT(1.5f);					//!< multiply original stretch length by this scalar to obtain particle diameter
